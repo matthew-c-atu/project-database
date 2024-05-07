@@ -1,0 +1,10 @@
+package db
+
+import (
+	"github.com/mattn/go-sqlite3"
+)
+
+func CreateDB() {
+	os.Remove("./music.db")
+	db, err := sqlite3.Cre
+}
