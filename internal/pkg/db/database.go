@@ -138,7 +138,7 @@ func PopulateDatabase(ctx context.Context, fileServerUrl string, db *bun.DB) err
 		log.Fatal(err)
 	}
 
-	hlsUrlBase := fmt.Sprintf("%v/music/hls", fileServerUrl)
+	// hlsUrlBase := fmt.Sprintf("%v/music/hls", fileServerUrl)
 	var songsCollection []Song
 	var i int
 	for k, v := range songsMap {
@@ -147,7 +147,7 @@ func PopulateDatabase(ctx context.Context, fileServerUrl string, db *bun.DB) err
 		song := Song{
 			// Id:    i,
 			Name:  k,
-			Url:   fmt.Sprintf("%s%s", hlsUrlBase, strings.ReplaceAll(v, " ", "%20")),
+			Url:   fmt.Sprintf("%s/%s", fileServerUrl, strings.ReplaceAll(v, " ", "%20")),
 			Genre: genresMap[k],
 		}
 		println(song.Url)

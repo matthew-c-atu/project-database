@@ -148,6 +148,7 @@ func (r *RootCfg) setupDb(ctx context.Context) (*bun.DB, error) {
 
 func searchSongs(ctx context.Context, musicDb *bun.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		c.Writer.Header().Add("Access-Control-Allow-Origin", "*")
 		nameQuery := c.Query("name")
 		// idQuery := c.Query("id")
 		genreQuery := c.Query("genre")
