@@ -39,7 +39,6 @@ GET /search?name={name}&genre={genre}	- Get songs by seaching on name and/or gen
 
 		println("about to serve...")
 		root.serve()
-
 	},
 }
 
@@ -59,9 +58,7 @@ func init() {
 }
 
 func (r *RootCfg) serve() {
-
 	port, err := r.Flags().GetInt("port")
-
 	if err != nil {
 		log.Fatal("Couldn't get port flag")
 	}
@@ -70,7 +67,6 @@ func (r *RootCfg) serve() {
 
 	ctx := context.Background()
 	musicDb, err := r.setupDb(ctx)
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -90,7 +86,6 @@ func (r *RootCfg) serve() {
 	if verbose {
 		slog.Info(fmt.Sprintf("Database info: %s", musicDb.String()))
 	}
-
 }
 
 func (r *RootCfg) printSongsInDB(musicDb *bun.DB) {
@@ -108,8 +103,8 @@ func (r *RootCfg) printSongsInDB(musicDb *bun.DB) {
 		resp := fmt.Sprintf("%s", marshaled)
 		println(resp)
 	}
-
 }
+
 func (r *RootCfg) setupDb(ctx context.Context) (*bun.DB, error) {
 	fileServerPort := 9001
 	fileServerUrl := fmt.Sprintf("http://localhost:%v", fileServerPort)
@@ -146,13 +141,11 @@ func searchSongs(ctx context.Context, musicDb *bun.DB) gin.HandlerFunc {
 			Where("? LIKE ?", bun.Ident("name"), fmt.Sprintf("%%%v%%", nameQuery)).
 			Where("? LIKE ?", bun.Ident("genre"), fmt.Sprintf("%%%v%%", genreQuery)).
 			Scan(ctx)
-
 		if err != nil {
 			slog.Info(err.Error())
 		}
 
 		marshaled, err := json.Marshal(songs)
-
 		if err != nil {
 			slog.Info(err.Error())
 		}

@@ -10,7 +10,6 @@ import (
 )
 
 func TestMapSongNamesToSongFiles(t *testing.T) {
-
 	type testCase struct {
 		a []string
 		b []string
@@ -42,21 +41,17 @@ func TestMapSongNamesToSongFiles(t *testing.T) {
 	}
 
 	t.Run("test valid cases", func(t *testing.T) {
-
 		for _, v := range validCases {
 			_, err := dbutils.MapSongNamesToSongFiles(v.a, v.b)
 			if err != nil {
 				t.Errorf("Invalid test case %s : %s - error: %s", v.a, v.b, err.Error())
 			}
 		}
-
 	})
 	t.Run("test invalid cases", func(t *testing.T) {
-
 		for _, v := range invalidCases {
 
 			songsMap, err := dbutils.MapSongNamesToSongFiles(v.a, v.b)
-
 			if err != nil {
 				// detected error - PASS
 				fmt.Printf("Successfully caught error: %v {a:%v, b:%v}\n", err.Error(), v.a, v.b)
@@ -66,12 +61,10 @@ func TestMapSongNamesToSongFiles(t *testing.T) {
 				t.Errorf("Failed on test case %s : %s", v.a, v.b)
 			}
 		}
-
 	})
 }
 
 func TestMapSongNamesToGenre(t *testing.T) {
-
 	type testCase struct {
 		a []string
 		b string
@@ -91,7 +84,6 @@ func TestMapSongNamesToGenre(t *testing.T) {
 }
 
 func TestGetSongStringsFromJsonResponse(t *testing.T) {
-
 	t.Run("valid response", func(t *testing.T) {
 		handlerFunc := func(w http.ResponseWriter, r *http.Request) {
 			resp := `["Foo - The Test", "Bar - The Unit"]`
@@ -136,7 +128,6 @@ func TestGetSongStringsFromJsonResponse(t *testing.T) {
 
 	t.Run("invalid url and endpoint", func(t *testing.T) {
 		_, err := dbutils.GetSongStringsFromJsonResponse("asdf", "hjkl")
-
 		if err != nil {
 			return
 		}
