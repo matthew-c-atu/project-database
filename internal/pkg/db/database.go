@@ -117,25 +117,25 @@ func GetSongsFromRows(table string, db *bun.DB) ([]Song, error) {
 func PopulateDatabase(ctx context.Context, fileServerUrl string, db *bun.DB) error {
 	songNames, err := GetSongStringsFromJsonResponse(fileServerUrl, "/songnames")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	println("got songnames")
 
 	songFiles, err := GetSongStringsFromJsonResponse(fileServerUrl, "/songfiles")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// need to wait for these to come back from server?
 
 	songsMap, err := MapSongNamesToSongFiles(songNames, songFiles)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	genresMap, err := MapSongNamesToGenre(songNames, "Drum and Bass")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// hlsUrlBase := fmt.Sprintf("%v/music/hls", fileServerUrl)
@@ -156,7 +156,7 @@ func PopulateDatabase(ctx context.Context, fileServerUrl string, db *bun.DB) err
 
 	_, err = db.NewInsert().Model(&songsCollection).Exec(ctx)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	for _, v := range songsCollection {
 		fmt.Println(v.Id)
