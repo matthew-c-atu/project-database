@@ -60,11 +60,7 @@ func MapSongNamesToGenre(songNames []string, genre string) (map[string]string, e
 }
 
 func GetSongStringsFromJsonResponse(url, endpoint string) ([]string, error) {
-	println("getting song strings...")
 	songFilesUrl := fmt.Sprintf("%v%v", url, endpoint)
-	println(songFilesUrl)
-	// songNamesUrl := "localhost:9001/songnames"
-	// songFilesReq, err := http.NewRequest(http.MethodGet, songFilesUrl, nil)
 	resp, err := http.Get(songFilesUrl)
 	if err != nil {
 		return nil, err
@@ -74,20 +70,11 @@ func GetSongStringsFromJsonResponse(url, endpoint string) ([]string, error) {
 	if resp.StatusCode != http.StatusOK {
 		return nil, err
 	}
-	println("making items")
 	var items []string
-
-	// var b []byte
-
-	// _, err = resp.Body.Read(b)
-	// if !json.Valid(b) {
-	// 	return nil, err
-	// }
 
 	dec := json.NewDecoder(resp.Body)
 	dec.Decode(&items)
 
-	println("why are you not printint??")
 	for _, item := range items {
 		println(item)
 	}
