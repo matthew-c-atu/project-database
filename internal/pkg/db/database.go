@@ -2,13 +2,12 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"strings"
-
-	"database/sql"
 
 	// _ "github.com/mattn/go-sqlite3"
 	"github.com/uptrace/bun"
@@ -90,7 +89,6 @@ func PrintTable(table string, db *bun.DB) error {
 	// if err != nil {
 	// 	log.Fatal("Could not exec print table: ", err)
 	// }
-
 }
 
 func GetSongsFromRows(table string, db *bun.DB) ([]Song, error) {
@@ -160,7 +158,6 @@ func PopulateDatabase(ctx context.Context, fileServerUrl string, db *bun.DB) err
 	}
 	for _, v := range songsCollection {
 		fmt.Println(v.Id)
-
 	}
 	// for _, v := range songsColletion {
 	// 	InsertData(v, db)
