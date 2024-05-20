@@ -54,7 +54,9 @@ func Execute() {
 func init() {
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbose logging")
 	rootCmd.PersistentFlags().BoolP("debug", "g", false, "Debug logging")
+	rootCmd.PersistentFlags().BoolP("docker", "d", false, "Toggle Docker mode - Uses host.docker.internal instead of localhost")
 	rootCmd.PersistentFlags().IntP("port", "p", 9002, "The port on which to run the service")
+	rootCmd.PersistentFlags().IntP("fileport", "f", 9001, "The port on which to look for the file server service")
 }
 
 func (r *RootCfg) serve() {
@@ -106,8 +108,23 @@ func (r *RootCfg) printSongsInDB(musicDb *bun.DB) {
 }
 
 func (r *RootCfg) setupDb(ctx context.Context) (*bun.DB, error) {
-	fileServerPort := 9001
-	fileServerUrl := fmt.Sprintf("http://localhost:%v", fileServerPort)
+	fileServerPort, err := r.Flags().GetInt("fileport")
+	if err != nil {
+		return nil, err
+	}
+
+	dockerFlag, err := r.Flags().GetBool("docker")
+	if err != nil {
+		return nil, err
+	}
+
+	var fileServerUrl string
+	if dockerFlag {
+		fileServerUrl = fmt.Sprintf("http://host.docker.internal:%v", fileServerPort)
+
+	} else {
+		fileServerUrl = fmt.Sprintf("http://localhost:%v", fileServerPort)
+	}
 
 	musicDb, err := db.CreateDB()
 	if err != nil {
