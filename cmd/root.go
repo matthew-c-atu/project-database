@@ -121,7 +121,6 @@ func (r *RootCfg) setupDb(ctx context.Context) (*bun.DB, error) {
 	var fileServerUrl string
 	if dockerFlag {
 		fileServerUrl = fmt.Sprintf("http://host.docker.internal:%v", fileServerPort)
-
 	} else {
 		fileServerUrl = fmt.Sprintf("http://localhost:%v", fileServerPort)
 	}
