@@ -47,13 +47,6 @@ func CreateTable(ctx context.Context, db *bun.DB) error {
 	if err != nil {
 		panic(err)
 	}
-
-	// sql := `CREATE TABLE IF NOT EXISTS songs(id INTEGER PRIMARY KEY, name TEXT NOT NULL, url TEXT NOT NULL, genre TEXT NOT NULL);`
-	// ctx, cancelfunc := context.WithTimeout(context.Background(), 5*time.Second)
-	// defer cancelfunc()
-	// _, err := db.ExecContext(ctx, sql)
-	// if err != nil {
-	// 	return errors.New("Failed to create tables in database ")
 	return nil
 }
 
@@ -143,7 +136,6 @@ func PopulateDatabase(ctx context.Context, fileServerUrl string, db *bun.DB) err
 		i++
 		fmt.Println(k, "\n", v)
 		song := Song{
-			// Id:    i,
 			Name:  k,
 			Url:   fmt.Sprintf("%s/%s", fileServerUrl, strings.ReplaceAll(v, " ", "%20")),
 			Genre: genresMap[k],

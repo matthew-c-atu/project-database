@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -144,7 +145,8 @@ func (r *RootCfg) setupDb(ctx context.Context) (*bun.DB, error) {
 
 func searchSongs(ctx context.Context, musicDb *bun.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Writer.Header().Add("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Cache-Control", "no-cache, no-store")
 		nameQuery := c.Query("name")
 		// idQuery := c.Query("id")
 		genreQuery := c.Query("genre")
@@ -166,5 +168,15 @@ func searchSongs(ctx context.Context, musicDb *bun.DB) gin.HandlerFunc {
 			slog.Info(err.Error())
 		}
 		c.Writer.Write(marshaled)
+	}
+}
+
+func addHeaders(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+		w.Header().Add("Cache-Control", "no-cache, no-store")
+		if h != nil {
+			h.ServeHTTP(w, r)
+		}
 	}
 }
