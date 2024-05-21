@@ -11,6 +11,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/matthew-c-atu/project-database/internal/pkg/db"
@@ -137,8 +138,10 @@ func (r *RootCfg) setupDb(ctx context.Context) (*bun.DB, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	time.Sleep(5 * time.Second)
 	err = db.PopulateDatabase(ctx, fileServerUrl, musicDb)
 	if err != nil {
+		println("failed to populate db")
 		log.Fatal(err)
 	}
 
