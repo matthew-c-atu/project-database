@@ -11,9 +11,8 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"time"
 
-	"github.com/gin-gonic/gin"
+	// "github.com/gin-gonic/gin"
 	"github.com/matthew-c-atu/project-database/internal/pkg/db"
 	"github.com/spf13/cobra"
 	"github.com/uptrace/bun"
@@ -85,7 +84,7 @@ func (r *RootCfg) serve() {
 		r.printSongsInDB(musicDb)
 	}
 
-	slog.Info(fmt.Sprintf("Starting datbase service on port %v\n", port))
+	slog.Info(fmt.Sprintf("Starting database service on port %v\n", port))
 
 	if verbose {
 		slog.Info(fmt.Sprintf("Database info: %s", musicDb.String()))
@@ -138,7 +137,6 @@ func (r *RootCfg) setupDb(ctx context.Context) (*bun.DB, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	time.Sleep(5 * time.Second)
 	err = db.PopulateDatabase(ctx, fileServerUrl, musicDb)
 	if err != nil {
 		println("failed to populate db")
@@ -148,33 +146,33 @@ func (r *RootCfg) setupDb(ctx context.Context) (*bun.DB, error) {
 	return musicDb, nil
 }
 
-func searchSongsGin(ctx context.Context, musicDb *bun.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// c.Header("Access-Control-Allow-Origin", "*")
-		// c.Header("Cache-Control", "no-cache, no-store")
-		nameQuery := c.Query("name")
-		// idQuery := c.Query("id")
-		genreQuery := c.Query("genre")
-		fmt.Printf("nameQuery: %v", nameQuery)
-
-		var songs []db.Song
-
-		err := musicDb.NewSelect().
-			Model(&songs).
-			Where("? LIKE ?", bun.Ident("name"), fmt.Sprintf("%%%v%%", nameQuery)).
-			Where("? LIKE ?", bun.Ident("genre"), fmt.Sprintf("%%%v%%", genreQuery)).
-			Scan(ctx)
-		if err != nil {
-			slog.Info(err.Error())
-		}
-
-		marshaled, err := json.Marshal(songs)
-		if err != nil {
-			slog.Info(err.Error())
-		}
-		c.Writer.Write(marshaled)
-	}
-}
+// func searchSongsGin(ctx context.Context, musicDb *bun.DB) gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		// c.Header("Access-Control-Allow-Origin", "*")
+// 		// c.Header("Cache-Control", "no-cache, no-store")
+// 		nameQuery := c.Query("name")
+// 		// idQuery := c.Query("id")
+// 		genreQuery := c.Query("genre")
+// 		fmt.Printf("nameQuery: %v", nameQuery)
+//
+// 		var songs []db.Song
+//
+// 		err := musicDb.NewSelect().
+// 			Model(&songs).
+// 			Where("? LIKE ?", bun.Ident("name"), fmt.Sprintf("%%%v%%", nameQuery)).
+// 			Where("? LIKE ?", bun.Ident("genre"), fmt.Sprintf("%%%v%%", genreQuery)).
+// 			Scan(ctx)
+// 		if err != nil {
+// 			slog.Info(err.Error())
+// 		}
+//
+// 		marshaled, err := json.Marshal(songs)
+// 		if err != nil {
+// 			slog.Info(err.Error())
+// 		}
+// 		c.Writer.Write(marshaled)
+// 	}
+// }
 
 func searchSongs(ctx context.Context, musicDb *bun.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
