@@ -12,5 +12,5 @@ RUN GOOS=linux go build -v -o /database
 
 EXPOSE 9002
 
-CMD ["/database", "-d"]
+CMD ["/database"]
 
