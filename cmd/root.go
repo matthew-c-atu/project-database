@@ -75,15 +75,10 @@ func (r *RootCfg) serve() {
 	}
 	defer musicDb.Close()
 
-	router := gin.Default()
-	router.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Cache-Control", "no-cache, no-store")
-	})
-
 	// TODO: FIX CROSS ORIGIN HEADER ON GIN CONTEXT!!!
-	router.GET("/search", searchSongs(ctx, musicDb))
-	router.Run(fmt.Sprintf("localhost:%v", port))
+	mux := http.NewServeMux()
+
+	mux.Handle("/search", addHeaders(searchSongs(ctx, musicDb)))
 
 	if debug {
 		r.printSongsInDB(musicDb)
@@ -94,6 +89,8 @@ func (r *RootCfg) serve() {
 	if verbose {
 		slog.Info(fmt.Sprintf("Database info: %s", musicDb.String()))
 	}
+
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), mux))
 }
 
 func (r *RootCfg) printSongsInDB(musicDb *bun.DB) {
@@ -148,7 +145,7 @@ func (r *RootCfg) setupDb(ctx context.Context) (*bun.DB, error) {
 	return musicDb, nil
 }
 
-func searchSongs(ctx context.Context, musicDb *bun.DB) gin.HandlerFunc {
+func searchSongsGin(ctx context.Context, musicDb *bun.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// c.Header("Access-Control-Allow-Origin", "*")
 		// c.Header("Cache-Control", "no-cache, no-store")
@@ -173,6 +170,34 @@ func searchSongs(ctx context.Context, musicDb *bun.DB) gin.HandlerFunc {
 			slog.Info(err.Error())
 		}
 		c.Writer.Write(marshaled)
+	}
+}
+
+func searchSongs(ctx context.Context, musicDb *bun.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// c.Header("Access-Control-Allow-Origin", "*")
+		// c.Header("Cache-Control", "no-cache, no-store")
+		nameQuery := r.URL.Query().Get("name")
+		// idQuery := c.Query("id")
+		genreQuery := r.URL.Query().Get("genre")
+		fmt.Printf("nameQuery: %v", nameQuery)
+
+		var songs []db.Song
+
+		err := musicDb.NewSelect().
+			Model(&songs).
+			Where("? LIKE ?", bun.Ident("name"), fmt.Sprintf("%%%v%%", nameQuery)).
+			Where("? LIKE ?", bun.Ident("genre"), fmt.Sprintf("%%%v%%", genreQuery)).
+			Scan(ctx)
+		if err != nil {
+			slog.Info(err.Error())
+		}
+
+		marshaled, err := json.Marshal(songs)
+		if err != nil {
+			slog.Info(err.Error())
+		}
+		w.Write(marshaled)
 	}
 }
 
