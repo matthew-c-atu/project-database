@@ -76,7 +76,12 @@ func (r *RootCfg) serve() {
 	defer musicDb.Close()
 
 	router := gin.Default()
+	router.Use(func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Cache-Control", "no-cache, no-store")
+	})
 
+	// TODO: FIX CROSS ORIGIN HEADER ON GIN CONTEXT!!!
 	router.GET("/search", searchSongs(ctx, musicDb))
 	router.Run(fmt.Sprintf("localhost:%v", port))
 
@@ -145,8 +150,8 @@ func (r *RootCfg) setupDb(ctx context.Context) (*bun.DB, error) {
 
 func searchSongs(ctx context.Context, musicDb *bun.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Cache-Control", "no-cache, no-store")
+		// c.Header("Access-Control-Allow-Origin", "*")
+		// c.Header("Cache-Control", "no-cache, no-store")
 		nameQuery := c.Query("name")
 		// idQuery := c.Query("id")
 		genreQuery := c.Query("genre")
